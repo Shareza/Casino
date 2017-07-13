@@ -9,10 +9,14 @@ namespace Casino
 {
     public partial class Default : System.Web.UI.Page
     {
-        static Random rng = new Random();
         private int bet = 1;
-        private int credits = 30;
+        private int credits;
+        private int win = 0;
+
+        static Random rng = new Random();
         Spinners InitCasino = new Spinners();
+
+       
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -21,20 +25,23 @@ namespace Casino
                 firstSpinnerImage.ImageUrl = @"Models/bar.png";
                 secondSpinnerImage.ImageUrl = @"Models/cherry.png";
                 thirdSpinnerImage.ImageUrl = @"Models/seven.png";
-                myCashLabel.Text = credits.ToString();
+
+                credits = 100;
+                ViewState["credits"] = credits;
+
+                bet = 1;
+                ViewState["bet"] = bet;
             }
-            else
-            {
-                UpdateBalance();
-            }
-            
-            //betLabel.Text = tempBet.ToString();
+
         }
 
         protected void spinButton_Click(object sender, EventArgs e)
         {
-            credits--;
-            myCashLabel.Text = credits.ToString();
+            myCashLabel.Text = ViewState["credits"].ToString();
+            credits = Int32.Parse(ViewState["credits"].ToString());
+            credits = credits - Convert.ToInt32(ViewState["bet"]);
+            ViewState["credits"] = credits;
+
 
             int firstSpinnerKey = rng.Next(6);
             int secondSpinnerKey = rng.Next(6);
@@ -56,14 +63,25 @@ namespace Casino
 
         protected void plusButton_Click(object sender, EventArgs e)
         {
-            //bet++;
-            //betLabel.Text = bet.ToString();
-            
+            betLabel.Text = ViewState["bet"].ToString();
+            bet = Int32.Parse(ViewState["bet"].ToString());
+            ++bet;
+            ViewState["bet"] = bet;
         }
 
         public void UpdateBalance()
         {
             myCashLabel.Text = credits.ToString();
+        }
+
+        public void GameLogic()
+        {
+            if (firstSpinnerImage.ImageUrl == @"Models/cherry.png" &&
+                secondSpinnerImage.ImageUrl == @"Models/cherry.png")
+            {
+                credits += 2;
+                currentWinLabel.Text = "You win 2";
+            }
         }
     }
 }
